@@ -10,7 +10,6 @@ function App() {
   const [messageType, setMessageType] = useState("success"); // Message type (success/error)
   const [loading, setLoading] = useState(false); // Loading state
   const [animeList, setAnimeList] = useState([]); // User's anime list
-  const [accessToken, setAccessToken] = useState(""); // OAuth2 access token
 
   // Function to initiate OAuth2 authentication
   async function startOAuth() {
@@ -37,23 +36,22 @@ function App() {
 
   // Function to fetch the user's anime list
   async function fetchAnimeList(token) {
-    if (!token) {
-      console.error("Access token is missing.");
-      return;
-    }
+    if (!token) return;
 
     setLoading(true);
     try {
-      const response = await fetch(`http://localhost:5000/user/anime-list?access_token=${token}`);
-      if (!response.ok) {
-        throw new Error("Failed to fetch anime list.");
-      }
+      const response = await fetch(
+        `http://localhost:5000/user/anime-list?access_token=${token}&username=${username}`
+      );
+      if (!response.ok) throw new Error("Failed to fetch anime list.");
+
       const data = await response.json();
       console.log("User's Anime List:", data);
-      setAnimeList(data.data || []); // MAL API returns the list in a 'data' array
+      setAnimeList(data.data || []);
+      setTestMessage("");
       setMessageType("success");
     } catch (error) {
-      console.error("Error fetching anime list:", error);
+      console.error(error);
       setTestMessage("Failed to load anime list.");
       setMessageType("error");
     } finally {
@@ -61,15 +59,12 @@ function App() {
     }
   }
 
-  // Handle token retrieval and fetch the user's anime list after login
+  // Detect token in URL and fetch anime list
   useEffect(() => {
     const urlParams = new URLSearchParams(window.location.search);
     const token = urlParams.get("token");
-    if (token) {
-      console.log("Got token:", token);
-      setAccessToken(token); // Save the access token
-      fetchAnimeList(token); // Fetch saved anime list
-    }
+
+    if (token) fetchAnimeList(token);
   }, []);
 
   return (
@@ -89,10 +84,7 @@ function App() {
           </button>
         </div>
 
-        {/* Display Test Message */}
         {testMessage && <TestMessage message={testMessage} type={messageType} />}
-
-        {/* Display Anime List */}
         {animeList.length > 0 && <AnimeList animeList={animeList} />}
       </main>
     </>
