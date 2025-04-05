@@ -8,3 +8,15 @@ createRoot(document.getElementById('root')).render(
     <App />
   </StrictMode>,
 )
+
+document.addEventListener("DOMContentLoaded", () => {
+  console.log("DOM fully loaded!");
+  
+
+  createRoot(document.getElementById("root")).render(
+    <StrictMode>
+      <App />
+    </StrictMode>
+  );
+});
+
