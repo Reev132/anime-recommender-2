@@ -1,7 +1,7 @@
-import React from "react";
-
 function AnimeList({ animeList }) {
-  if (!animeList || animeList.length === 0) return null;
+  if (!animeList || animeList.length === 0) {
+    return <p>No anime found in your list.</p>;
+  }
 
   return (
     <div className="anime-list">
@@ -16,5 +16,3 @@ function AnimeList({ animeList }) {
     </div>
   );
 }
-
-export default AnimeList;

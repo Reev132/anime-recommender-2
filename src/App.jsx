@@ -37,35 +37,39 @@ function App() {
   // Function to fetch the user's anime list
   async function fetchAnimeList(token) {
     if (!token) return;
-
+  
     setLoading(true);
     try {
       const response = await fetch(
         `http://localhost:5000/user/anime-list?access_token=${token}&username=${username}`
       );
+  
       if (!response.ok) throw new Error("Failed to fetch anime list.");
-
+  
       const data = await response.json();
-      console.log("User's Anime List:", data);
-      setAnimeList(data.data || []);
+      console.log("Fetched Anime List:", data); // Debugging log
+      setAnimeList(data?.data || []); // Ensure correct structure
       setTestMessage("");
       setMessageType("success");
     } catch (error) {
-      console.error(error);
+      console.error("Fetch Anime List Error:", error); // Debugging log
       setTestMessage("Failed to load anime list.");
       setMessageType("error");
     } finally {
       setLoading(false);
     }
   }
+  
 
   // Detect token in URL and fetch anime list
   useEffect(() => {
     const urlParams = new URLSearchParams(window.location.search);
     const token = urlParams.get("token");
-
+    console.log("Detected OAuth Token:", token); // Debugging log
+  
     if (token) fetchAnimeList(token);
   }, []);
+  
 
   return (
     <>
