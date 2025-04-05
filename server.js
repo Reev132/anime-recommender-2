@@ -76,7 +76,7 @@ app.listen(PORT, () => {
 });
 
 // Endpoint to fetch the user's anime list
-app.get("/user/anime-list", async (req, res) => {
+app.get("/users/ {user_name} /anime-list", async (req, res) => {
     const { access_token } = req.query; // Expecting the token from the frontend
 
     if (!access_token) {

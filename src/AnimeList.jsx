@@ -1,8 +1,8 @@
 import React from "react";
 
 function AnimeList({ animeList }) {
-  if (animeList.length === 0) {
-    return <p>No anime found on your list.</p>;
+  if (!animeList || animeList.length === 0) {
+    return null; // Do not render anything if there is no anime list
   }
 
   return (

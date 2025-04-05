@@ -112,3 +112,19 @@ header h1 {
   margin-bottom: 10px;
   font-size: 16px;
 }
+
+.test-message.success {
+  color: green;
+}
+
+.test-message.error {
+  color: red;
+}
+
+.anime-list {
+  margin-top: 20px;
+}
+
+.anime-item {
+  margin-bottom: 10px;
+}

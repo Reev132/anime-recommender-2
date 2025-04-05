@@ -5,12 +5,12 @@ import TestMessage from "./TestMessage";
 import AnimeList from "./AnimeList";
 
 function App() {
-  const [username, setUsername] = useState(""); // State for storing the username
-  const [testMessage, setTestMessage] = useState("");
-  const [messageType, setMessageType] = useState("success");
-  const [loading, setLoading] = useState(false);
-  const [animeList, setAnimeList] = useState([]); // State for storing the user's anime list
-  const [accessToken, setAccessToken] = useState(""); // State for storing the access token
+  const [username, setUsername] = useState(""); // User's MyAnimeList username
+  const [testMessage, setTestMessage] = useState(""); // Feedback message
+  const [messageType, setMessageType] = useState("success"); // Message type (success/error)
+  const [loading, setLoading] = useState(false); // Loading state
+  const [animeList, setAnimeList] = useState([]); // User's anime list
+  const [accessToken, setAccessToken] = useState(""); // OAuth2 access token
 
   // Function to initiate OAuth2 authentication
   async function startOAuth() {
@@ -37,15 +37,17 @@ function App() {
 
   // Function to fetch the user's anime list
   async function fetchAnimeList(token) {
-    if (!username) {
-      setTestMessage("Please enter your MyAnimeList username.");
-      setMessageType("error");
+    if (!token) {
+      console.error("Access token is missing.");
       return;
     }
 
     setLoading(true);
     try {
       const response = await fetch(`http://localhost:5000/user/anime-list?access_token=${token}`);
+      if (!response.ok) {
+        throw new Error("Failed to fetch anime list.");
+      }
       const data = await response.json();
       console.log("User's Anime List:", data);
       setAnimeList(data.data || []); // MAL API returns the list in a 'data' array
@@ -65,7 +67,7 @@ function App() {
     const token = urlParams.get("token");
     if (token) {
       console.log("Got token:", token);
-      setAccessToken(token);
+      setAccessToken(token); // Save the access token
       fetchAnimeList(token); // Fetch saved anime list
     }
   }, []);
@@ -91,7 +93,7 @@ function App() {
         {testMessage && <TestMessage message={testMessage} type={messageType} />}
 
         {/* Display Anime List */}
-        <AnimeList animeList={animeList} />
+        {animeList.length > 0 && <AnimeList animeList={animeList} />}
       </main>
     </>
   );
