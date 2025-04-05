@@ -15,7 +15,7 @@ function App() {
     const token = urlParams.get("token");
     if (token) {
       console.log("Got token:", token);
-      setTestMessage("Token received!");
+      setTestMessage("Token is received!");
       setMessageType("success");
       fetchRecommendations(token);
     }
