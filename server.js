@@ -69,7 +69,7 @@ app.get("/callback", async (req, res) => {
         console.log("Token response:", data);
 
         if (data.access_token) {
-            res.json({ access_token: data.access_token });
+            res.redirect(`http://localhost:5173/callback?token=${data.access_token}`);
         } else {
             res.status(400).send("Failed to get access token");
         }

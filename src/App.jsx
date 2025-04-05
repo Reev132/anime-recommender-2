@@ -3,26 +3,21 @@ import "./index.css";
 import Header from "./Header";
 import TestMessage from "./TestMessage";
 import AnimeList from "./AnimeList";
-import { BrowserRouter as Router, Routes, Route } from "react-router-dom";
-import Callback from "./Callback";
-
 
 function App() {
-  const [username, setUsername] = useState(""); // User's MyAnimeList username
-  const [testMessage, setTestMessage] = useState(""); // Feedback message
-  const [messageType, setMessageType] = useState("success"); // Message type (success/error)
-  const [loading, setLoading] = useState(false); // Loading state
-  const [animeList, setAnimeList] = useState([]); // User's anime list
-  const [isMockMode, setIsMockMode] = useState(false); // Mock mode flag
+  const [username, setUsername] = useState("");
+  const [testMessage, setTestMessage] = useState("");
+  const [messageType, setMessageType] = useState("success");
+  const [loading, setLoading] = useState(false);
+  const [animeList, setAnimeList] = useState([]);
+  const [isMockMode, setIsMockMode] = useState(false);
 
-  // Mock anime list for testing
   const mockAnimeList = [
     { node: { title: "Naruto" }, list_status: { status: "completed" } },
     { node: { title: "Attack on Titan" }, list_status: { status: "watching" } },
     { node: { title: "One Piece" }, list_status: { status: "watching" } },
   ];
 
-  // Function to initiate OAuth2 authentication
   async function startOAuth() {
     if (!username) {
       setTestMessage("Please enter your MyAnimeList username.");
@@ -35,7 +30,7 @@ function App() {
       const response = await fetch("http://localhost:5000/authorize");
       const data = await response.json();
       console.log("Auth URL received:", data.auth_url);
-      window.location.href = data.auth_url; // Redirect user to MyAnimeList login page
+      window.location.href = data.auth_url;
     } catch (error) {
       console.error("Error:", error);
       setTestMessage("Error getting auth URL");
@@ -45,7 +40,6 @@ function App() {
     }
   }
 
-  // Function to fetch the user's anime list
   async function fetchAnimeList(token) {
     if (!token) return;
 
@@ -54,17 +48,15 @@ function App() {
       const response = await fetch(
         `http://localhost:5000/user/anime-list?access_token=${token}`
       );
-      
 
       if (!response.ok) throw new Error("Failed to fetch anime list.");
-
       const data = await response.json();
-      console.log("Fetched Anime List:", data); // Debugging log
-      setAnimeList(data?.data || []); // Ensure correct structure
+      console.log("Fetched Anime List:", data);
+      setAnimeList(data?.data || []);
       setTestMessage("");
       setMessageType("success");
     } catch (error) {
-      console.error("Fetch Anime List Error:", error); // Debugging log
+      console.error("Fetch Anime List Error:", error);
       setTestMessage("Failed to load anime list.");
       setMessageType("error");
     } finally {
@@ -72,13 +64,17 @@ function App() {
     }
   }
 
-  // Detect token in URL and fetch anime list
   useEffect(() => {
     const urlParams = new URLSearchParams(window.location.search);
-    const token = urlParams.get("token");
-    console.log("Detected OAuth Token:", token); // Debugging log
+    const tokenInUrl = urlParams.get("token");
 
-    if (token) fetchAnimeList(token);
+    if (tokenInUrl) {
+      localStorage.setItem("mal_token", tokenInUrl);
+      fetchAnimeList(tokenInUrl);
+    } else {
+      const storedToken = localStorage.getItem("mal_token");
+      if (storedToken) fetchAnimeList(storedToken);
+    }
   }, []);
 
   return (
@@ -96,20 +92,13 @@ function App() {
           <button className="submit-button" onClick={startOAuth} disabled={loading}>
             {loading ? "Loading..." : "Log in with MyAnimeList"}
           </button>
-          {/* Button to test mock data */}
           <button className="submit-button" onClick={() => setIsMockMode(true)}>
             Use Mock Data
           </button>
         </div>
 
-        {/* Test message */}
         {testMessage && <TestMessage message={testMessage} type={messageType} />}
-
-        {/* Render Anime List */}
-        {/* Show mock list only when mock mode is enabled */}
         {isMockMode && <AnimeList animeList={mockAnimeList} />}
-
-        {/* Show real data when fetched */}
         {!isMockMode && animeList.length > 0 && <AnimeList animeList={animeList} />}
       </main>
     </>
