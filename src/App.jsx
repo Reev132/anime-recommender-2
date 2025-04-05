@@ -1,9 +1,16 @@
+import { useState, useEffect } from "react";
+import "./index.css";
+import Header from "./Header";
+import TestMessage from "./TestMessage";
+import AnimeList from "./AnimeList";
+
 function App() {
   const [username, setUsername] = useState(""); // User's MyAnimeList username
   const [testMessage, setTestMessage] = useState(""); // Feedback message
   const [messageType, setMessageType] = useState("success"); // Message type (success/error)
   const [loading, setLoading] = useState(false); // Loading state
   const [animeList, setAnimeList] = useState([]); // User's anime list
+  const [isMockMode, setIsMockMode] = useState(false); // Mock mode flag
 
   // Mock anime list for testing
   const mockAnimeList = [
@@ -42,8 +49,9 @@ function App() {
     setLoading(true);
     try {
       const response = await fetch(
-        `http://localhost:5000/user/anime-list?access_token=${token}&username=${username}`
+        `http://localhost:5000/user/anime-list?access_token=${token}`
       );
+      
 
       if (!response.ok) throw new Error("Failed to fetch anime list.");
 
@@ -68,9 +76,6 @@ function App() {
     console.log("Detected OAuth Token:", token); // Debugging log
 
     if (token) fetchAnimeList(token);
-
-    // Uncomment this line only for testing mock data
-    // setAnimeList(mockAnimeList);
   }, []);
 
   return (
@@ -88,17 +93,21 @@ function App() {
           <button className="submit-button" onClick={startOAuth} disabled={loading}>
             {loading ? "Loading..." : "Log in with MyAnimeList"}
           </button>
+          {/* Button to test mock data */}
+          <button className="submit-button" onClick={() => setIsMockMode(true)}>
+            Use Mock Data
+          </button>
         </div>
 
         {/* Test message */}
         {testMessage && <TestMessage message={testMessage} type={messageType} />}
 
         {/* Render Anime List */}
-        {animeList.length > 0 ? (
-          <AnimeList animeList={animeList} />
-        ) : (
-          <p>No anime found. Please log in to view your list.</p>
-        )}
+        {/* Show mock list only when mock mode is enabled */}
+        {isMockMode && <AnimeList animeList={mockAnimeList} />}
+
+        {/* Show real data when fetched */}
+        {!isMockMode && animeList.length > 0 && <AnimeList animeList={animeList} />}
       </main>
     </>
   );

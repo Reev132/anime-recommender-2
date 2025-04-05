@@ -89,12 +89,13 @@ app.get("/user/anime-list", async (req, res) => {
 
     try {
         // Use @me if no username is provided
-        const userPath = username ? `users/${username}` : "users/@me";
-        const response = await fetch(`https://api.myanimelist.net/v2/${userPath}/animelist?fields=list_status`, {
-            headers: {
-                Authorization: `Bearer ${access_token}`,
-            },
+        const userPath = "users/@me"; // hardcode this
+        const response = await fetch(`https://api.myanimelist.net/v2/${userPath}/animelist?fields=list_status&limit=1000`, {
+          headers: {
+            Authorization: `Bearer ${access_token}`,
+          },
         });
+        
 
         if (response.ok) {
             const data = await response.json();
