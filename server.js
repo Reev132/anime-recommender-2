@@ -2,6 +2,7 @@ import express from "express";
 import cors from "cors";
 import fetch from "node-fetch";
 import dotenv from "dotenv";
+import crypto from "crypto";
 
 dotenv.config();
 
@@ -26,13 +27,20 @@ function generateCodeVerifier() {
     return result;
 }
 
+// Generate code challenge from code verifier
+function generateCodeChallenge(codeVerifier) {
+    return crypto.createHash("sha256").update(codeVerifier).digest("base64url");
+}
+
 // OAuth2 authorization endpoint
 app.get("/authorize", (req, res) => {
     const codeVerifier = generateCodeVerifier();
     tempCodeVerifier = codeVerifier;
+    const codeChallenge = generateCodeChallenge(codeVerifier);
     console.log("Generated code verifier:", codeVerifier);
+    console.log("Generated code challenge:", codeChallenge);
 
-    const authUrl = `https://myanimelist.net/v1/oauth2/authorize?response_type=code&client_id=${CLIENT_ID}&code_challenge=${codeVerifier}&redirect_uri=${REDIRECT_URI}`;
+    const authUrl = `https://myanimelist.net/v1/oauth2/authorize?response_type=code&client_id=${CLIENT_ID}&code_challenge=${codeChallenge}&code_challenge_method=S256&redirect_uri=${REDIRECT_URI}`;
     res.json({ auth_url: authUrl });
 });
 
