@@ -74,3 +74,33 @@ app.get("/callback", async (req, res) => {
 app.listen(PORT, () => {
     console.log(`Server running on http://localhost:${PORT}`);
 });
+
+// Endpoint to fetch the user's anime list
+app.get("/user/anime-list", async (req, res) => {
+    const { access_token } = req.query; // Expecting the token from the frontend
+
+    if (!access_token) {
+        return res.status(400).json({ message: "Access token is required" });
+    }
+
+    try {
+        const response = await fetch("https://api.myanimelist.net/v2/users/@me/animelist?fields=list_status", {
+            headers: {
+                "Authorization": `Bearer ${access_token}`,
+            },
+        });
+
+        if (response.ok) {
+            const data = await response.json();
+            res.json(data); // Return the anime list to the client
+        } else {
+            const errorData = await response.json();
+            console.error("Error fetching anime list:", errorData);
+            res.status(response.status).json({ message: "Failed to fetch anime list", error: errorData });
+        }
+    } catch (error) {
+        console.error("Server error:", error);
+        res.status(500).json({ message: "Server error", error: error.message });
+    }
+});
+
