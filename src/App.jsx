@@ -1,9 +1,3 @@
-import { useState, useEffect } from "react";
-import "./index.css";
-import Header from "./Header";
-import TestMessage from "./TestMessage";
-import AnimeList from "./AnimeList";
-
 function App() {
   const [username, setUsername] = useState(""); // User's MyAnimeList username
   const [testMessage, setTestMessage] = useState(""); // Feedback message
@@ -75,7 +69,7 @@ function App() {
 
     if (token) fetchAnimeList(token);
 
-    // Uncomment this line to test with mock data instead of fetching from API
+    // Uncomment this line only for testing mock data
     // setAnimeList(mockAnimeList);
   }, []);
 
@@ -100,11 +94,11 @@ function App() {
         {testMessage && <TestMessage message={testMessage} type={messageType} />}
 
         {/* Render Anime List */}
-        {/* Uncomment this line to test with mock data */}
-        <AnimeList animeList={mockAnimeList} />
-
-        {/* Uncomment this line when using real API */}
-        {/* {animeList.length > 0 && <AnimeList animeList={animeList} />} */}
+        {animeList.length > 0 ? (
+          <AnimeList animeList={animeList} />
+        ) : (
+          <p>No anime found. Please log in to view your list.</p>
+        )}
       </main>
     </>
   );
