@@ -1,5 +1,8 @@
 import { useState, useEffect } from "react";
 import "./index.css";
+import Header from "./Header";
+import TestMessage from "./TestMessage";
+import AnimeList from "./AnimeList";
 
 function App() {
   const [username, setUsername] = useState("");
@@ -57,9 +60,7 @@ function App() {
 
   return (
     <>
-      <header className="header">
-        <h1>MyAnimeList Viewer</h1>
-      </header>
+      <Header />
       <main className="container">
         <div className="outer-square">
           <input
@@ -75,25 +76,10 @@ function App() {
         </div>
 
         {/* Display Test Message */}
-        {testMessage && (
-          <div className={`test-message ${messageType}`}>
-            <p>{testMessage}</p>
-          </div>
-        )}
+        {testMessage && <TestMessage message={testMessage} type={messageType} />}
 
         {/* Display Anime List */}
-        {animeList.length > 0 && (
-          <div className="anime-list">
-            <h2>Your Anime List:</h2>
-            <ul>
-              {animeList.map((anime, index) => (
-                <li key={index}>
-                  <strong>{anime.node.title}</strong> - {anime.list_status.status}
-                </li>
-              ))}
-            </ul>
-          </div>
-        )}
+        <AnimeList animeList={animeList} />
       </main>
     </>
   );
