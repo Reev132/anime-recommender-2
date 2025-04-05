@@ -16,3 +16,5 @@ function AnimeList({ animeList }) {
     </div>
   );
 }
+export default AnimeList;
+
