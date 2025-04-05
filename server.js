@@ -71,29 +71,6 @@ app.get("/callback", async (req, res) => {
     }
 });
 
-// Recommendations endpoint
-app.post("/recommendations", async (req, res) => {
-    const { access_token } = req.body;
-
-    try {
-        const response = await fetch("https://api.myanimelist.net/v2/anime/recommendations", {
-            headers: {
-                "Authorization": `Bearer ${access_token}`
-            }
-        });
-
-        if (response.ok) {
-            const data = await response.json();
-            res.json({ recommendations: data });
-        } else {
-            res.status(500).json({ message: "Failed to fetch recommendations" });
-        }
-    } catch (error) {
-        console.error("Recommendations endpoint error:", error);
-        res.status(500).json({ message: "Server error", error: error.message });
-    }
-});
-
 app.listen(PORT, () => {
     console.log(`Server running on http://localhost:${PORT}`);
 });
