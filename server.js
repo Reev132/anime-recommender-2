@@ -79,35 +79,49 @@ app.get("/callback", async (req, res) => {
     }
 });
 
-// Endpoint to fetch the user's anime list
+// Endpoint to fetch the full user's anime list (all statuses)
 app.get("/user/anime-list", async (req, res) => {
-    const { access_token, username } = req.query;
+    const { access_token } = req.query;
 
     if (!access_token) {
         return res.status(400).json({ message: "Access token is required" });
     }
 
-    try {
-        // Use @me if no username is provided
-        const userPath = "users/@me"; // hardcode this
-        const response = await fetch(`https://api.myanimelist.net/v2/${userPath}/animelist?fields=list_status&limit=1000`, {
-          headers: {
-            Authorization: `Bearer ${access_token}`,
-          },
-        });
-        
-
-        if (response.ok) {
-            const data = await response.json();
-            res.json(data); // Return the anime list to the client
-        } else {
-            const errorData = await response.json();
-            console.error("Error fetching anime list:", errorData);
-            res.status(response.status).json({ message: "Failed to fetch anime list", error: errorData });
+    const statuses = ["watching", "completed", "on_hold", "dropped", "plan_to_watch"];
+    const fetchListByStatus = async (status) => {
+        try {
+            const response = await fetch(
+                `https://api.myanimelist.net/v2/users/@me/animelist?fields=list_status&status=${status}&limit=1000`,
+                {
+                    headers: {
+                        Authorization: `Bearer ${access_token}`,
+                    },
+                }
+            );
+            if (response.ok) {
+                const data = await response.json();
+                return data.data || [];
+            } else {
+                const error = await response.json();
+                console.error(`Failed to fetch status '${status}':`, error);
+                return [];
+            }
+        } catch (err) {
+            console.error(`Error fetching status '${status}':`, err.message);
+            return [];
         }
-    } catch (error) {
-        console.error("Server error:", error);
-        res.status(500).json({ message: "Server error", error: error.message });
+    };
+
+    try {
+        const allAnime = [];
+        for (const status of statuses) {
+            const list = await fetchListByStatus(status);
+            allAnime.push(...list);
+        }
+        res.json({ data: allAnime });
+    } catch (err) {
+        console.error("Server error:", err);
+        res.status(500).json({ message: "Failed to fetch anime list", error: err.message });
     }
 });
 
