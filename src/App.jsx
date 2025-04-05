@@ -11,6 +11,13 @@ function App() {
   const [loading, setLoading] = useState(false); // Loading state
   const [animeList, setAnimeList] = useState([]); // User's anime list
 
+  // Mock anime list for testing
+  const mockAnimeList = [
+    { node: { title: "Naruto" }, list_status: { status: "completed" } },
+    { node: { title: "Attack on Titan" }, list_status: { status: "watching" } },
+    { node: { title: "One Piece" }, list_status: { status: "watching" } },
+  ];
+
   // Function to initiate OAuth2 authentication
   async function startOAuth() {
     if (!username) {
@@ -37,15 +44,15 @@ function App() {
   // Function to fetch the user's anime list
   async function fetchAnimeList(token) {
     if (!token) return;
-  
+
     setLoading(true);
     try {
       const response = await fetch(
         `http://localhost:5000/user/anime-list?access_token=${token}&username=${username}`
       );
-  
+
       if (!response.ok) throw new Error("Failed to fetch anime list.");
-  
+
       const data = await response.json();
       console.log("Fetched Anime List:", data); // Debugging log
       setAnimeList(data?.data || []); // Ensure correct structure
@@ -59,17 +66,18 @@ function App() {
       setLoading(false);
     }
   }
-  
 
   // Detect token in URL and fetch anime list
   useEffect(() => {
     const urlParams = new URLSearchParams(window.location.search);
     const token = urlParams.get("token");
     console.log("Detected OAuth Token:", token); // Debugging log
-  
+
     if (token) fetchAnimeList(token);
+
+    // Uncomment this line to test with mock data instead of fetching from API
+    // setAnimeList(mockAnimeList);
   }, []);
-  
 
   return (
     <>
@@ -88,8 +96,15 @@ function App() {
           </button>
         </div>
 
+        {/* Test message */}
         {testMessage && <TestMessage message={testMessage} type={messageType} />}
-        {animeList.length > 0 && <AnimeList animeList={animeList} />}
+
+        {/* Render Anime List */}
+        {/* Uncomment this line to test with mock data */}
+        <AnimeList animeList={mockAnimeList} />
+
+        {/* Uncomment this line when using real API */}
+        {/* {animeList.length > 0 && <AnimeList animeList={animeList} />} */}
       </main>
     </>
   );
