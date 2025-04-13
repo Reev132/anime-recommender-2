@@ -1,10 +1,12 @@
-import { useState, useEffect } from "react";
-import "./index.css";
+import { Routes, Route } from "react-router-dom";
+import Callback from "./Callback";
 import Header from "./Header";
 import TestMessage from "./TestMessage";
 import AnimeList from "./AnimeList";
+import { useState, useEffect } from "react";
+import "./index.css";
 
-function App() {
+function MainApp() {
   const [username, setUsername] = useState("");
   const [testMessage, setTestMessage] = useState("");
   const [messageType, setMessageType] = useState("success");
@@ -102,6 +104,15 @@ function App() {
         {!isMockMode && animeList.length > 0 && <AnimeList animeList={animeList} />}
       </main>
     </>
+  );
+}
+
+function App() {
+  return (
+    <Routes>
+      <Route path="/" element={<MainApp />} />
+      <Route path="/callback" element={<Callback />} />
+    </Routes>
   );
 }
 
